@@ -8,7 +8,6 @@ import numpy as np
 # # Creating an instance of the Instaloader class
 bot = instaloader.Instaloader()
 # #bot.login(user="Your_username",passwd="Your_password") #Use this code to log-in to your account.
-
 def read(path):
     # creating a data frame
     conn = sqlite3.connect("instagram_artists_apresearch.db")
@@ -58,6 +57,7 @@ def read(path):
                         # web.open("https://www.instagram.com/" + p.username + "/")
                     
                     # counter += 1
+                                
             except Exception as e:
                 conn.commit()
                 conn.close()
@@ -67,20 +67,54 @@ def read(path):
     conn.close()
     # print(counter)
 
+    #    post_iterator = profile.get_posts()
+    #    try:
+    #        for post in post_iterator:
+    #            do_something_with(post)
+    #    except Exception as e:
+    #        save("resume_information.json", post_iterator.freeze())
+
+    # and later reuse it with :meth:`NodeIterator.thaw` on an equally-constructed NodeIterator::
+
+    #    post_iterator = profile.get_posts()
+    #    post_iterator.thaw(load("resume_information.json"))
+    
 def sql():
     conn = sqlite3.connect("instagram_artists_apresearch.db")
     cursor = conn.cursor()
 
     # cmd = ""
-    # cmd = """CREATE TABLE postswAI AS 
+    # cmd = """CREATE TABLE reelsposts AS 
     #         SELECT * FROM posts;"""
 
     # cmd = """SELECT shortcode, COUNT(*)
     #          FROM temp_table2
     #          GROUP BY shortcode
     #          HAVING COUNT(*) > 1"""
-    # cmd = """DROP TABLE temp_table2"""
+    # cmd = """ALTER TABLE POSTS
+    #          DROP COLUMN genre"""
+    # cmd= """SELECT EXISTS(SELECT 1 FROM REELSPOSTS WHERE shortcode = "C0_0d_pIQOE")"""
+    # cursor.execute(cmd)
+    # exists = cursor.fetchone()[0]
 
+    # if(exists):
+    #     cmd= """UPDATE REELSPOSTS
+    #             SET IS_REEL = TRUE
+    #             WHERE shortcode = 'C0_0d_pIQOE'"""
+    #     print("fgdfdg")
+    #     cursor.execute(cmd)
+    # cmd= """INSERT INTO POSTS
+    #         SELECT *
+    #         FROM POSTS t1
+    #         LEFT JOIN REELSPOSTS t2 ON t2.shortcode = t1.shortcode
+    #         WHERE t2.shortcode IS NULL"""
+    # """
+    # cmd= """INSERT INTO POSTS(OWNER_USER_ID, OWNER_USERNAME, NUM_LIKES, NUM_COMMENTS, SHORTCODE, IMG_URL, POST_DATE, IS_REEL, IS_HUMAN, GENRE)
+    #         SELECT OWNER_USER_ID, OWNER_USERNAME, NUM_LIKES, NUM_COMMENTS, SHORTCODE, IMG_URL, POST_DATE, IS_REEL, IS_HUMAN, GENRE
+    #         FROM REELSPOSTS
+    #         WHERE shortcode NOT IN
+    #             (SELECT shortcode 
+    #             FROM POSTS)"""
     # cmd ="""CREATE TABLE temp_table2 AS
     #         SELECT shortcode, img_url
     #         FROM posts
@@ -103,7 +137,13 @@ def sql():
     # is_human BOOLEAN,
     # PRIMARY KEY (user_id)
     # );"""
-
+    # cmd = "ALTER TABLE posts RENAME TO postsorig;"
+    # cursor.execute(cmd)
+    # cmd = "ALTER TABLE profiles RENAME TO profilesorig;"
+    # cursor.execute(cmd)
+    # cmd = "ALTER TABLE postswai RENAME TO posts;"
+    # cursor.execute(cmd)
+    # cmd = "ALTER TABLE profileswai RENAME TO profiles;"
     # cmd = """CREATE TABLE temp_table(
     # shortcode VARCHAR(255),
     # owner_user_id INT,
@@ -118,37 +158,37 @@ def sql():
     # PRIMARY KEY(shortcode)
     # FOREIGN KEY(owner_user_id) REFERENCES Profiles(user_id)
     # );"""
-    df = pd.read_sql('SELECT * FROM postswAI', conn)
-    # print(df.head())
-    # print(df.size)
-    # df.drop_duplicates()
-    # print(df.size)
-    # import pandas as pd
+    # df = pd.read_sql('SELECT * FROM postswAI', conn)
+    # # print(df.head())
+    # # print(df.size)
+    # # df.drop_duplicates()
+    # # print(df.size)
+    # # import pandas as pd
 
 
-    # Generate some sample data
-    # date_range = pd.date_range('2022-01-01', '2022-05-01', freq='D')
-    # values = np.random.randn(len(date_range)).cumsum()
-    # data = {'date_column': date_range, 'value_column': values}
-    # df = pd.DataFrame(data)
+    # # Generate some sample data
+    # # date_range = pd.date_range('2022-01-01', '2022-05-01', freq='D')
+    # # values = np.random.randn(len(date_range)).cumsum()
+    # # data = {'date_column': date_range, 'value_column': values}
+    # # df = pd.DataFrame(data)
 
-    df['post_date'] = pd.to_datetime(df['post_date'])
+    # df['post_date'] = pd.to_datetime(df['post_date'])
 
-    # Calculate average likes per group and date
-    avg_likes = df.groupby(['is_human', pd.Grouper(key='post_date', freq='3M')])['num_likes'].mean().reset_index()
+    # # Calculate average likes per group and date
+    # avg_likes = df.groupby(['is_human', pd.Grouper(key='post_date', freq='3M')])['num_likes'].mean().reset_index()
 
-    # Pivot the data for easier plotting
-    pivot_df = avg_likes.pivot(index='post_date', columns='is_human', values='num_likes')
+    # # Pivot the data for easier plotting
+    # pivot_df = avg_likes.pivot(index='post_date', columns='is_human', values='num_likes')
 
-    # Plotting
-    pivot_df.plot(kind='line', marker='o', figsize=(10, 6))
-    plt.title('Average Number of Likes Over Time')
-    plt.xlabel('Date')
-    plt.ylabel('Average Number of Likes')
-    plt.grid(True)
-    plt.legend(title='Group')
-    plt.tight_layout()
-    plt.show()
+    # # Plotting
+    # pivot_df.plot(kind='line', marker='o', figsize=(10, 6))
+    # plt.title('Average Number of Likes Over Time')
+    # plt.xlabel('Date')
+    # plt.ylabel('Average Number of Likes')
+    # plt.grid(True)
+    # plt.legend(title='Group')
+    # plt.tight_layout()
+    # plt.show()
     # # Create the plot
     # plt.plot(index=df['post_date'], values=df['num_likes'], linestyle = 'solid')
 
@@ -161,44 +201,21 @@ def sql():
     # # Display the plot
     # plt.show()
 
-    # cursor.execute(cmd)
+    # cmd= """SELECT column_id, name
+    #         FROM sys.columns
+    #         WHERE object_id = Object_id('POSTS')
+    #         ORDER BY column_id"""
 
-    # conn.commit()
+    cursor.execute(cmd)
+    # for x in cursor.fetchmany(5):
+    #     print(x)
+
+    conn.commit()
     # print(cursor.fetchall())
     # conn.commit()
     conn.close()
 
 
-def getBasicInfo():
-    profileid = input('Enter the userid of the profile\n')
-    # Loading the profile from an Instagram handle
-    profile = instaloader.Profile.from_username(bot.context, profileid)
-    print("Username: ", profile.username)
-    print("User ID: ", profile.userid)
-    print("Number of Posts: ", profile.mediacount)
-    print("Followers Count: ", profile.followers)
-    print("Following Count: ", profile.followees)
-    print("Bio: ", profile.biography)
-    print("External URL: ", profile.external_url)   
-    print('\n')
-
-def downloadPost():
-    useerid = input('Enter the userid of the profile\n')
-    # Loading a profile from an Instagram handle
-    profile = instaloader.Profile.from_username(bot.context, useerid)
-    
-    # Retrieving all posts in an object
-    posts = profile.get_posts()
-    count = 0
-    # Iterating and downloading all the individual posts
-    for index, post in enumerate(posts, 1):
-        # if count < posts.:
-        # bot.download_post(post, target=f"{profile.username}_{index}")
-        # count+=1
-        print(f"instagram.com/p/{post.shortcode}/")
-
-        # else:
-        #     break
 
 if __name__ == '__main__':
     # p = instaloader.Profile.from_username(bot.context,"kuzminanastya")
